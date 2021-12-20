@@ -2,17 +2,26 @@ import requests
 import json
 def main():
     #asks for zipcode
-    zip = input("welcome to the weather getter! please enter your US zipcode to see the current weather: ")
+    zip = input("welcome to the weather getter! Weather will be shown in imperial units (fahrenheit,MPH) \n please enter your US zipcode to see the current weather: ")
     #sends API request with zip code
-    response2 = requests.get("http://api.openweathermap.org/data/2.5/weather?zip=" + zip + ",us&appid=f2b31e94ffa61826806d46f2b74ed462")
+    try:
+        response2 = requests.get("http://api.openweathermap.org/data/2.5/weather?zip=" + zip + ",us&units=imperial&appid=f2b31e94ffa61826806d46f2b74ed462")
+    except:
+        print ("\nerror, could not connect to API service (check your connection)\n")
+        main()
     #prints status code
     print (response2.status_code)
     #checks if status code is valid, if not it will prompt user for valid input
     if response2.status_code == 200:
         print("zipcode: OK")
-    else:
+    elif response2.status_code == 404:
         print("error, invalid zip code. Please enter valid zip code")
         main()
+    else:
+        print (response2.status_code)
+        print ("error, please read response code above \n")
+        main()
+
     #creates dictionary using the received json data after converting the data to string format
     dict1 = json.loads(response2.text)
     #creates dictionary to store weather data
@@ -26,7 +35,7 @@ def main():
     #prints keys and values in dict 2 for displaying
     for key, val in dict2.items():
         print ("{}: {}".format(key,val))
-    print ("windspeed: " , dict1["wind"]["speed"])
+    print ("windspeed: " , dict1["wind"]["speed"] , " MPH")
     print ("Location Name: " , dict1["name"])
     restartpr()
 #typical restart function
